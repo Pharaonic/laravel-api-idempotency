@@ -2,82 +2,62 @@
 
 declare(strict_types=1);
 
-namespace Pharaonic\Laravel\ApiIdempotency\Tests\Feature;
-
 use Illuminate\Routing\Route as LaravelRoute;
 use Illuminate\Support\Facades\Route;
-use InvalidArgumentException;
 use Pharaonic\Laravel\ApiIdempotency\Http\Middleware\EnsureIdempotency;
 use Pharaonic\Laravel\ApiIdempotency\Tests\Fixtures\OrderController;
-use Pharaonic\Laravel\ApiIdempotency\Tests\TestCase;
 
-final class MacroTest extends TestCase
-{
-    public function test_idempotent_returns_the_route_and_keeps_the_fluent_chain(): void
-    {
-        $route = Route::post('chain', [OrderController::class, 'store']);
+test('idempotent returns the route and keeps the fluent chain', function () {
+    $route = Route::post('chain', [OrderController::class, 'store']);
 
-        $this->assertSame($route, $route->idempotent());
-        $this->assertSame($route, $route->idempotent()->name('chain')->middleware('throttle:60,1'));
-        $this->assertSame('chain', $route->getName());
+    expect($route->idempotent())->toBe($route);
+    expect($route->idempotent()->name('chain')->middleware('throttle:60,1'))->toBe($route);
+    expect($route->getName())->toBe('chain');
+});
+
+test('it adds the middleware as a plain string', function () {
+    expect(Route::post('a', [OrderController::class, 'store'])->idempotent()->middleware())->toBe([EnsureIdempotency::class]);
+    expect(Route::post('b', [OrderController::class, 'store'])->idempotent(600)->middleware())->toBe([EnsureIdempotency::class.':600']);
+    expect(Route::post('c', [OrderController::class, 'store'])->idempotent(ttl: 604800)->middleware())->toBe([EnsureIdempotency::class.':604800']);
+});
+
+test('it works on resource registrations', function () {
+    Route::apiResource('things', OrderController::class)->idempotent(ttl: 60);
+    $routes = $this->app['router']->getRoutes();
+    $routes->refreshNameLookups();
+
+    foreach (['things.index', 'things.store', 'things.show', 'things.update', 'things.destroy'] as $name) {
+        $route = $routes->getByName($name);
+        expect($route)->toBeInstanceOf(LaravelRoute::class);
+        $this->assertContains(EnsureIdempotency::class.':60', $route->middleware(), $name);
     }
+});
 
-    public function test_it_adds_the_middleware_as_a_plain_string(): void
-    {
-        $this->assertSame([EnsureIdempotency::class], Route::post('a', [OrderController::class, 'store'])->idempotent()->middleware());
-        $this->assertSame([EnsureIdempotency::class.':600'], Route::post('b', [OrderController::class, 'store'])->idempotent(600)->middleware());
-        $this->assertSame([EnsureIdempotency::class.':604800'], Route::post('c', [OrderController::class, 'store'])->idempotent(ttl: 604800)->middleware());
-    }
+dataset('invalidArguments', function () {
+    return [
+        'zero ttl' => [0, 'The idempotency route ttl must be a whole number of seconds from 1 to 31536000.'],
+        'negative ttl' => [-5, 'The idempotency route ttl must be a whole number of seconds from 1 to 31536000.'],
+        'ttl over a year' => [31536001, 'The idempotency route ttl must be a whole number of seconds from 1 to 31536000.'],
+    ];
+});
 
-    public function test_it_works_on_resource_registrations(): void
-    {
-        Route::apiResource('things', OrderController::class)->idempotent(ttl: 60);
-        $routes = $this->app['router']->getRoutes();
-        $routes->refreshNameLookups();
+test('invalid arguments fail when the route is defined', function (int $ttl, string $message) {
+    $this->expectException(InvalidArgumentException::class);
+    $this->expectExceptionMessage($message);
 
-        foreach (['things.index', 'things.store', 'things.show', 'things.update', 'things.destroy'] as $name) {
-            $route = $routes->getByName($name);
-            $this->assertInstanceOf(LaravelRoute::class, $route);
-            $this->assertContains(EnsureIdempotency::class.':60', $route->middleware(), $name);
-        }
-    }
+    Route::post('invalid-route', [OrderController::class, 'store'])->idempotent($ttl);
+})->with('invalidArguments');
 
-    /**
-     * @return array<string, array{int, string}>
-     */
-    public static function invalidArguments(): array
-    {
-        return [
-            'zero ttl' => [0, 'The idempotency route ttl must be a whole number of seconds from 1 to 31536000.'],
-            'negative ttl' => [-5, 'The idempotency route ttl must be a whole number of seconds from 1 to 31536000.'],
-            'ttl over a year' => [31536001, 'The idempotency route ttl must be a whole number of seconds from 1 to 31536000.'],
-        ];
-    }
+test('the longest and shortest ttls are accepted', function () {
+    expect(Route::post('a', [OrderController::class, 'store'])->idempotent(1)->middleware())->toBe([EnsureIdempotency::class.':1']);
+    expect(Route::post('b', [OrderController::class, 'store'])->idempotent(31536000)->middleware())->toBe([EnsureIdempotency::class.':31536000']);
+});
 
-    /**
-     * @dataProvider invalidArguments
-     */
-    public function test_invalid_arguments_fail_when_the_route_is_defined(int $ttl, string $message): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage($message);
+test('a malformed ttl parameter written by hand is rejected', function () {
+    Route::post('hand-written', [OrderController::class, 'store'])->middleware(['auth:fixture', 'idempotent:ten']);
+    $this->withoutExceptionHandling();
+    $this->expectException(InvalidArgumentException::class);
+    $this->expectExceptionMessage('The idempotency route ttl must be a whole number of seconds from 1 to 31536000.');
 
-        Route::post('invalid-route', [OrderController::class, 'store'])->idempotent($ttl);
-    }
-
-    public function test_the_longest_and_shortest_ttls_are_accepted(): void
-    {
-        $this->assertSame([EnsureIdempotency::class.':1'], Route::post('a', [OrderController::class, 'store'])->idempotent(1)->middleware());
-        $this->assertSame([EnsureIdempotency::class.':31536000'], Route::post('b', [OrderController::class, 'store'])->idempotent(31536000)->middleware());
-    }
-
-    public function test_a_malformed_ttl_parameter_written_by_hand_is_rejected(): void
-    {
-        Route::post('hand-written', [OrderController::class, 'store'])->middleware(['auth:fixture', 'idempotent:ten']);
-        $this->withoutExceptionHandling();
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The idempotency route ttl must be a whole number of seconds from 1 to 31536000.');
-
-        $this->idempotent('/hand-written');
-    }
-}
+    $this->idempotent('/hand-written');
+});
