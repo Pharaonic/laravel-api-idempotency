@@ -2,6 +2,15 @@
 
 All notable changes to this project are documented here.
 
+## 13.0.0 - Unreleased
+
+### Compatibility
+
+- Laravel 13 on PHP 8.3, 8.4 and 8.5 (`illuminate/*` ^13.0). PHP 8.2 is no longer supported on this line.
+- The same API and behavior as 12.0.0.
+- `pharaonic/php-fingerprint` ~8.3.0, ~8.4.0 or ~8.5.0, matching the PHP version.
+- The tests run on Pest 4 and PHPUnit 12.
+
 ## 12.0.0 - Unreleased
 
 ### Compatibility
