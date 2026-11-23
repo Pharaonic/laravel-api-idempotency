@@ -4,8 +4,8 @@ Install the package with Composer and run its migration.
 
 ### Requirements
 
-- PHP 8.2, 8.3 or 8.4
-- Laravel 11.x
+- PHP 8.2, 8.3, 8.4 or 8.5
+- Laravel 12.x
 - A database supported by Laravel (MySQL, MariaDB, PostgreSQL, SQLite) or Redis (phpredis or predis)
 
 ### Composer Installation
