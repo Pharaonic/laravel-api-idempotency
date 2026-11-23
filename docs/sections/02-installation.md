@@ -4,8 +4,8 @@ Install the package with Composer and run its migration.
 
 ### Requirements
 
-- PHP 8.1, 8.2 or 8.3
-- Laravel 10.x
+- PHP 8.2, 8.3 or 8.4
+- Laravel 11.x
 - A database supported by Laravel (MySQL, MariaDB, PostgreSQL, SQLite) or Redis (phpredis or predis)
 
 ### Composer Installation
@@ -37,13 +37,12 @@ The file lands in `config/pharaonic/api-idempotency.php`.
 
 ### Schedule Pruning
 
-Expired database records are deleted by a command. Schedule it in `app/Console/Kernel.php`:
+Expired database records are deleted by a command. Schedule it in `routes/console.php`:
 
-```php title="app/Console/Kernel.php"
-protected function schedule(Schedule $schedule)
-{
-    $schedule->command('idempotency:prune --apply')->hourly();
-}
+```php title="routes/console.php"
+use Illuminate\Support\Facades\Schedule;
+
+Schedule::command('idempotency:prune --apply')->hourly();
 ```
 
 :::success Installation Complete

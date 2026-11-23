@@ -25,22 +25,19 @@ Each code is also a constant on the exception (`IdempotencyException::KEY_CONFLI
 
 ### Your own error format
 
-Render the exception yourself in your exception handler to match your API's envelope:
+Render the exception yourself in `bootstrap/app.php` to match your API's envelope:
 
-```php title="app/Exceptions/Handler.php"
+```php title="bootstrap/app.php"
+use Illuminate\Foundation\Configuration\Exceptions;
 use Pharaonic\Laravel\ApiIdempotency\Exceptions\IdempotencyException;
-use Throwable;
 
-public function render($request, Throwable $exception)
-{
-    if ($exception instanceof IdempotencyException) {
+->withExceptions(function (Exceptions $exceptions) {
+    $exceptions->render(function (IdempotencyException $e) {
         return response()->json([
-            'error' => ['code' => $exception->errorCode(), 'detail' => $exception->getMessage()],
-        ], $exception->getStatusCode(), $exception->getHeaders());
-    }
-
-    return parent::render($request, $exception);
-}
+            'error' => ['code' => $e->errorCode(), 'detail' => $e->getMessage()],
+        ], $e->getStatusCode(), $e->getHeaders());
+    });
+})
 ```
 
 Replays are never changed: they carry your application's original body and status.

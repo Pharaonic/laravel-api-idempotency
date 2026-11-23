@@ -2,6 +2,15 @@
 
 All notable changes to this project are documented here.
 
+## 11.0.0 - Unreleased
+
+### Compatibility
+
+- Laravel 11 on PHP 8.2, 8.3 and 8.4 (`illuminate/*` ^11.0). PHP 8.1 is no longer supported on this line.
+- The same API and behavior as 10.0.0.
+- `pharaonic/php-fingerprint` ~8.2.0, ~8.3.0 or ~8.4.0, matching the PHP version.
+- The tests run on Pest 3 and PHPUnit 11.
+
 ## 10.0.0 - Unreleased
 
 ### Added
