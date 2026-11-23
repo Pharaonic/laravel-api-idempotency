@@ -2,6 +2,14 @@
 
 All notable changes to this project are documented here.
 
+## 9.0.0 - Unreleased
+
+### Compatibility
+
+- Laravel 9.33+ on PHP 8.0, 8.1 and 8.2 (`illuminate/*` ^9.33). 9.33 is the first 9.x release that requires a Carbon release working on PHP 8.2.
+- The same API and behavior as 8.0.0.
+- `pharaonic/php-fingerprint` ~8.0.3, ~8.1.0 or ~8.2.0, matching the PHP version.
+
 ## 8.0.0 - Unreleased
 
 ### Compatibility
