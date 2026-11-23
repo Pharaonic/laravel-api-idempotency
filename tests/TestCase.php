@@ -332,7 +332,8 @@ abstract class TestCase extends Orchestra
             unset($job['env']);
 
             $process = proc_open(
-                [PHP_BINARY, __DIR__.'/Fixtures/harness.php', (string) json_encode($job)],
+                // The job goes through stdin: Windows does not keep a JSON argument's quotes.
+                [PHP_BINARY, __DIR__.'/Fixtures/harness.php'],
                 [0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => ['pipe', 'w']],
                 $pipes,
                 dirname(__DIR__),
@@ -343,6 +344,7 @@ abstract class TestCase extends Orchestra
                 throw new RuntimeException('Could not start a child process.');
             }
 
+            fwrite($pipes[0], (string) json_encode($job));
             fclose($pipes[0]);
             $processes[] = [$process, $pipes];
         }

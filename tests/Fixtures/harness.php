@@ -1,9 +1,9 @@
 <?php
 
 /*
- * Runs one job of TestCase::spawn() in its own PHP process and prints its
- * result as JSON: a request through the HTTP kernel, an Artisan command, or
- * an inspection of the registered routes.
+ * Runs one job of TestCase::spawn(), read as JSON from stdin, in its own PHP
+ * process and prints its result as JSON: a request through the HTTP kernel,
+ * an Artisan command, or an inspection of the registered routes.
  */
 
 declare(strict_types=1);
@@ -18,7 +18,7 @@ use Pharaonic\Laravel\ApiIdempotency\Tests\Fixtures\Harness;
 
 require __DIR__.'/../../vendor/autoload.php';
 
-$job = json_decode($argv[1] ?? '', true);
+$job = json_decode((string) stream_get_contents(STDIN), true);
 
 if (! is_array($job)) {
     fwrite(STDERR, "No job given.\n");
