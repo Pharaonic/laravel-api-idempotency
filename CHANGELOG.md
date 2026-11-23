@@ -2,6 +2,18 @@
 
 All notable changes to this project are documented here.
 
+## 10.0.0 - Unreleased
+
+### Added
+
+- Laravel Boost resources: a guideline in `resources/boost/guidelines/core.blade.php` and the `api-idempotency-development` skill, picked up by `php artisan boost:install`.
+
+### Compatibility
+
+- Laravel 10 on PHP 8.1, 8.2 and 8.3 (`illuminate/*` ^10.0). PHP 8.0 is no longer supported on this line.
+- The same API and behavior as 9.0.0.
+- `pharaonic/php-fingerprint` ~8.1.0, ~8.2.0 or ~8.3.0, matching the PHP version.
+
 ## 9.0.0 - Unreleased
 
 ### Compatibility
