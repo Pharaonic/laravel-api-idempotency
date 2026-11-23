@@ -1,0 +1,20 @@
+- Getting Started
+  - [Overview](#overview)
+  - [Installation](#installation)
+  - [Configuration](#configuration)
+- Usage
+  - [Basic Usage](#basic-usage)
+  - [How It Works](#how-it-works)
+  - [Scopes](#scopes)
+  - [Fingerprints](#fingerprints)
+  - [Stores](#stores)
+  - [Failures and Recovery](#failures-and-recovery)
+  - [Errors](#errors)
+  - [Events and Logs](#events)
+- API Reference
+  - [Reference](#api-reference)
+- Examples
+  - [Use Cases](#examples)
+  - [Troubleshooting](#troubleshooting)
+- Community
+  - [Contributors](#contributors)
