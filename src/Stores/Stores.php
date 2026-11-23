@@ -23,8 +23,7 @@ final class Stores
     public function __construct(
         private Container $container,
         private Repository $config,
-    ) {
-    }
+    ) {}
 
     /**
      * "database" or "redis"

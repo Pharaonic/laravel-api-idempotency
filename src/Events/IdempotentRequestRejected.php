@@ -19,6 +19,5 @@ final class IdempotentRequestRejected
         public Request $request,
         public string $key,
         public string $reason,
-    ) {
-    }
+    ) {}
 }

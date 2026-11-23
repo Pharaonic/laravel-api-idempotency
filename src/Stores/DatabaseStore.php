@@ -24,8 +24,7 @@ final class DatabaseStore implements Store
     public function __construct(
         private ConnectionInterface $connection,
         private string $table,
-    ) {
-    }
+    ) {}
 
     public function reserve(Record $record, int $now): ?Record
     {

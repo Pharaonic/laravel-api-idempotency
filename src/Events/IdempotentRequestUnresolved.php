@@ -21,6 +21,5 @@ final class IdempotentRequestUnresolved
         public Request $request,
         public string $key,
         public string $reason,
-    ) {
-    }
+    ) {}
 }

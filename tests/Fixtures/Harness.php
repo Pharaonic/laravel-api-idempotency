@@ -9,6 +9,4 @@ use Pharaonic\Laravel\ApiIdempotency\Tests\TestCase;
 /**
  * Builds the fixture application outside a test run, for child processes
  */
-final class Harness extends TestCase
-{
-}
+final class Harness extends TestCase {}
