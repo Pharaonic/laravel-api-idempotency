@@ -2,127 +2,100 @@
 
 declare(strict_types=1);
 
-namespace Pharaonic\Laravel\ApiIdempotency\Tests\Integration;
-
 use Pharaonic\Laravel\ApiIdempotency\Support\Record;
-use Pharaonic\Laravel\ApiIdempotency\Tests\TestCase;
 
-final class StoreTest extends TestCase
-{
-    /**
-     * @dataProvider backends
-     */
-    public function test_only_the_first_reservation_of_a_key_wins(string $backend): void
-    {
-        $store = $this->storeFor($backend);
-        $first = $this->storeRecord('owner-a');
+test('only the first reservation of a key wins', function (string $backend) {
+    $store = $this->storeFor($backend);
+    $first = $this->storeRecord('owner-a');
 
-        $this->assertNull($store->reserve($first, self::START));
+    expect($store->reserve($first, self::START))->toBeNull();
 
-        $existing = $store->reserve($this->storeRecord('owner-b', 'other-fingerprint'), self::START + 1);
-        $this->assertInstanceOf(Record::class, $existing);
-        $this->assertSame('owner-a', $existing->owner);
-        $this->assertSame(Record::PROCESSING, $existing->state);
-        $this->assertSame(str_repeat('f', 64), $existing->fingerprint);
-        $this->assertSame(self::START + 120, $existing->leaseExpiresAt);
-        $this->assertSame(self::START + 600, $existing->expiresAt);
-        $this->assertSame('POST', $existing->method);
-        $this->assertSame('/orders', $existing->route);
+    $existing = $store->reserve($this->storeRecord('owner-b', 'other-fingerprint'), self::START + 1);
+    expect($existing)->toBeInstanceOf(Record::class);
+    expect($existing->owner)->toBe('owner-a');
+    expect($existing->state)->toBe(Record::PROCESSING);
+    expect($existing->fingerprint)->toBe(str_repeat('f', 64));
+    expect($existing->leaseExpiresAt)->toBe(self::START + 120);
+    expect($existing->expiresAt)->toBe(self::START + 600);
+    expect($existing->method)->toBe('POST');
+    expect($existing->route)->toBe('/orders');
 
-        $this->assertNull($store->reserve($this->storeRecord('owner-c', 'other', 'another-key'), self::START), 'Other keys are independent.');
-    }
+    $this->assertNull($store->reserve($this->storeRecord('owner-c', 'other', 'another-key'), self::START), 'Other keys are independent.');
+})->with('backends');
 
-    /**
-     * @dataProvider backends
-     */
-    public function test_a_completed_record_keeps_its_response_until_it_expires(string $backend): void
-    {
-        $store = $this->storeFor($backend);
-        $record = $this->storeRecord('owner-a');
-        $store->reserve($record, self::START);
+test('a completed record keeps its response until it expires', function (string $backend) {
+    $store = $this->storeFor($backend);
+    $record = $this->storeRecord('owner-a');
+    $store->reserve($record, self::START);
 
-        $this->assertTrue($store->replace('owner-a', $record->complete(self::START + 5, 600, 201, ['content-type' => ['application/json'], 'location' => ['/orders/1']], '{"id":1,"name":"é"}')));
+    expect($store->replace('owner-a', $record->complete(self::START + 5, 600, 201, ['content-type' => ['application/json'], 'location' => ['/orders/1']], '{"id":1,"name":"é"}')))->toBeTrue();
 
-        $completed = $store->reserve($this->storeRecord('owner-b'), self::START + 604);
-        $this->assertInstanceOf(Record::class, $completed);
-        $this->assertSame(Record::COMPLETED, $completed->state);
-        $this->assertSame(201, $completed->status);
-        $this->assertSame(['content-type' => ['application/json'], 'location' => ['/orders/1']], $completed->headers);
-        $this->assertSame('{"id":1,"name":"é"}', $completed->body);
-        $this->assertSame(self::START + 5, $completed->completedAt);
-        $this->assertSame(self::START + 605, $completed->expiresAt);
+    $completed = $store->reserve($this->storeRecord('owner-b'), self::START + 604);
+    expect($completed)->toBeInstanceOf(Record::class);
+    expect($completed->state)->toBe(Record::COMPLETED);
+    expect($completed->status)->toBe(201);
+    expect($completed->headers)->toBe(['content-type' => ['application/json'], 'location' => ['/orders/1']]);
+    expect($completed->body)->toBe('{"id":1,"name":"é"}');
+    expect($completed->completedAt)->toBe(self::START + 5);
+    expect($completed->expiresAt)->toBe(self::START + 605);
 
-        $this->assertNull($store->reserve($this->storeRecord('owner-b'), self::START + 605), 'At its expiry the key is new.');
-    }
+    $this->assertNull($store->reserve($this->storeRecord('owner-b'), self::START + 605), 'At its expiry the key is new.');
+})->with('backends');
 
-    /**
-     * @dataProvider backends
-     */
-    public function test_an_empty_body_survives_storage(string $backend): void
-    {
-        $store = $this->storeFor($backend);
-        $record = $this->storeRecord('owner-a');
-        $store->reserve($record, self::START);
-        $store->replace('owner-a', $record->complete(self::START, 600, 204, [], ''));
+test('an empty body survives storage', function (string $backend) {
+    $store = $this->storeFor($backend);
+    $record = $this->storeRecord('owner-a');
+    $store->reserve($record, self::START);
+    $store->replace('owner-a', $record->complete(self::START, 600, 204, [], ''));
 
-        $completed = $store->reserve($this->storeRecord('owner-b'), self::START + 1);
-        $this->assertInstanceOf(Record::class, $completed);
-        $this->assertSame(204, $completed->status);
-        $this->assertSame('', $completed->body);
-        $this->assertSame([], $completed->headers);
-    }
+    $completed = $store->reserve($this->storeRecord('owner-b'), self::START + 1);
+    expect($completed)->toBeInstanceOf(Record::class);
+    expect($completed->status)->toBe(204);
+    expect($completed->body)->toBe('');
+    expect($completed->headers)->toBe([]);
+})->with('backends');
 
-    /**
-     * @dataProvider backends
-     */
-    public function test_only_the_owner_of_a_processing_record_can_change_it(string $backend): void
-    {
-        $store = $this->storeFor($backend);
-        $record = $this->storeRecord('owner-a');
-        $store->reserve($record, self::START);
+test('only the owner of a processing record can change it', function (string $backend) {
+    $store = $this->storeFor($backend);
+    $record = $this->storeRecord('owner-a');
+    $store->reserve($record, self::START);
 
-        $this->assertFalse($store->replace('owner-b', $record->unknown(self::START, 600)));
-        $this->assertFalse($store->release($record->key, 'owner-b'));
+    expect($store->replace('owner-b', $record->unknown(self::START, 600)))->toBeFalse();
+    expect($store->release($record->key, 'owner-b'))->toBeFalse();
 
-        // A takeover fences the old owner out.
-        $takeover = $this->storeRecord('owner-b');
-        $this->assertTrue($store->replace('owner-a', $takeover));
-        $this->assertFalse($store->replace('owner-a', $record->complete(self::START, 600, 201, [], '{}')));
-        $this->assertFalse($store->release($record->key, 'owner-a'));
+    // A takeover fences the old owner out.
+    $takeover = $this->storeRecord('owner-b');
+    expect($store->replace('owner-a', $takeover))->toBeTrue();
+    expect($store->replace('owner-a', $record->complete(self::START, 600, 201, [], '{}')))->toBeFalse();
+    expect($store->release($record->key, 'owner-a'))->toBeFalse();
 
-        // Finished records are final.
-        $this->assertTrue($store->replace('owner-b', $takeover->complete(self::START, 600, 201, [], '{"by":"b"}')));
-        $this->assertFalse($store->replace('owner-b', $takeover->unknown(self::START, 600)));
-        $this->assertFalse($store->release($record->key, 'owner-b'));
+    // Finished records are final.
+    expect($store->replace('owner-b', $takeover->complete(self::START, 600, 201, [], '{"by":"b"}')))->toBeTrue();
+    expect($store->replace('owner-b', $takeover->unknown(self::START, 600)))->toBeFalse();
+    expect($store->release($record->key, 'owner-b'))->toBeFalse();
 
-        $stored = $store->reserve($this->storeRecord('owner-c'), self::START + 1);
-        $this->assertInstanceOf(Record::class, $stored);
-        $this->assertSame('{"by":"b"}', $stored->body);
-    }
+    $stored = $store->reserve($this->storeRecord('owner-c'), self::START + 1);
+    expect($stored)->toBeInstanceOf(Record::class);
+    expect($stored->body)->toBe('{"by":"b"}');
+})->with('backends');
 
-    /**
-     * @dataProvider backends
-     */
-    public function test_a_released_key_can_be_reserved_again(string $backend): void
-    {
-        $store = $this->storeFor($backend);
-        $store->reserve($this->storeRecord('owner-a'), self::START);
+test('a released key can be reserved again', function (string $backend) {
+    $store = $this->storeFor($backend);
+    $store->reserve($this->storeRecord('owner-a'), self::START);
 
-        $this->assertTrue($store->release($this->storeRecord('owner-a')->key, 'owner-a'));
-        $this->assertNull($store->reserve($this->storeRecord('owner-b'), self::START));
-    }
+    expect($store->release($this->storeRecord('owner-a')->key, 'owner-a'))->toBeTrue();
+    expect($store->reserve($this->storeRecord('owner-b'), self::START))->toBeNull();
+})->with('backends');
 
-    public function test_redis_records_expire_by_themselves_with_their_ttl(): void
-    {
-        $store = $this->storeFor('phpredis');
-        $record = $this->storeRecord('owner-a');
-        $store->reserve($record, self::START);
-        $redis = $this->app['redis']->connection();
-        $key = config('pharaonic.api-idempotency.store.prefix').$record->key;
+test('redis records expire by themselves with their ttl', function () {
+    $store = $this->storeFor('phpredis');
+    $record = $this->storeRecord('owner-a');
+    $store->reserve($record, self::START);
+    $redis = $this->app['redis']->connection();
+    $key = config('pharaonic.api-idempotency.store.prefix').$record->key;
 
-        $this->assertEqualsWithDelta(600000, $redis->pttl($key), 2000);
+    $this->assertEqualsWithDelta(600000, $redis->pttl($key), 2000);
 
-        $store->replace('owner-a', $record->complete(self::START, 86400, 201, [], '{}'));
-        $this->assertEqualsWithDelta(86400000, $redis->pttl($key), 2000);
-    }
-}
+    $store->replace('owner-a', $record->complete(self::START, 86400, 201, [], '{}'));
+    $this->assertEqualsWithDelta(86400000, $redis->pttl($key), 2000);
+});
