@@ -17,9 +17,17 @@ final class RouteCacheTest extends TestCase
 {
     public function test_cached_routes_keep_the_macro_middleware_names_binding_and_auth(): void
     {
-        $cache = $this->temporaryFile('php');
+        // Relative to the base path: Laravel 6 reads only paths starting with "/"
+        // as absolute, so a Windows temporary path would be appended to it.
+        $relative = 'bootstrap/cache/idempotency-routes-'.bin2hex(random_bytes(6)).'.php';
+        $cache = $this->app->basePath($relative);
+        $this->beforeApplicationDestroyed(static function () use ($cache): void {
+            if (is_file($cache)) {
+                @unlink($cache);
+            }
+        });
         $env = $this->useBackend('sqlite') + [
-            'APP_ROUTES_CACHE' => $cache,
+            'APP_ROUTES_CACHE' => $relative,
             'IDEMPOTENCY_TEST_LEDGER' => $ledger = $this->temporaryFile('log'),
         ];
         Order::query()->insert(['id' => 7, 'total' => 300]);

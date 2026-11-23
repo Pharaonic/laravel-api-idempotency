@@ -43,7 +43,7 @@ Configuration keys (`pharaonic.api-idempotency.*`), publish tags, and registered
 ## Tests
 
 - `tests/Integration` runs against real servers when `IDEMPOTENCY_TEST_MYSQL`, `IDEMPOTENCY_TEST_PGSQL` (JSON `host`, `port`, `username`, `password`, `database`) and `IDEMPOTENCY_TEST_REDIS_HOST` (`host:port`) are set, and skips them otherwise; SQLite always runs. CI provides MySQL, PostgreSQL and Redis services on Ubuntu.
-- Concurrency, crash and route-cache tests start real PHP processes through `tests/Fixtures/harness.php`. The crash test needs `posix` and skips on Windows.
+- Concurrency, crash and route-cache tests start real PHP processes through `tests/Fixtures/worker.php`, which reads its job from a JSON file named by its only argument and runs with `register_argc_argv=1`. The script is not called `harness.php`: Windows file names ignore case, so the autoloader would include it for the `Harness` class. The crash test needs `posix` and skips on Windows.
 - `route:cache` runs Laravel's own command with only its fresh-application factory replaced (`Fixtures\FreshRouteCacheCommand`), because Testbench's `bootstrap/app.php` does not load the package. This works on every line, so no Testbench `remote()` floor is needed. The cache path comes from `APP_ROUTES_CACHE`.
 - MySQL and PostgreSQL tests drop and recreate their tables: point them at a throwaway database, and do not run two suites against one database at once.
 

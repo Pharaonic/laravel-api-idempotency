@@ -324,6 +324,7 @@ abstract class TestCase extends Orchestra
     {
         $startAt = microtime(true) + 1.5;
         $processes = [];
+        $files = [];
         $base = array_merge(getenv(), $env);
 
         foreach ($jobs as $job) {
@@ -331,9 +332,19 @@ abstract class TestCase extends Orchestra
             $jobEnv = array_merge($base, is_array($job['env'] ?? null) ? $job['env'] : []);
             unset($job['env']);
 
+            // The job goes through a file and only its path is an argument, so no
+            // platform's argument quoting can change the JSON. register_argc_argv is
+            // forced on: Windows runners' php.ini turns it off, leaving no $argv.
+            $file = tempnam(sys_get_temp_dir(), 'idempotency-job-');
+
+            if ($file === false || file_put_contents($file, json_encode($job, JSON_THROW_ON_ERROR)) === false) {
+                throw new RuntimeException('Could not write a child process job.');
+            }
+
+            $files[] = $file;
+
             $process = proc_open(
-                // The job goes through stdin: Windows does not keep a JSON argument's quotes.
-                [PHP_BINARY, __DIR__.'/Fixtures/harness.php'],
+                [PHP_BINARY, '-d', 'register_argc_argv=1', __DIR__.'/Fixtures/worker.php', $file],
                 [0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => ['pipe', 'w']],
                 $pipes,
                 dirname(__DIR__),
@@ -344,7 +355,6 @@ abstract class TestCase extends Orchestra
                 throw new RuntimeException('Could not start a child process.');
             }
 
-            fwrite($pipes[0], (string) json_encode($job));
             fclose($pipes[0]);
             $processes[] = [$process, $pipes];
         }
@@ -361,6 +371,8 @@ abstract class TestCase extends Orchestra
 
             $results[] = is_array($decoded) ? $decoded : ['crashed' => $code, 'output' => $output, 'errors' => $errors];
         }
+
+        array_map('unlink', $files);
 
         return $results;
     }
