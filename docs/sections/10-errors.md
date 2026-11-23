@@ -29,8 +29,9 @@ Render the exception yourself in your exception handler to match your API's enve
 
 ```php title="app/Exceptions/Handler.php"
 use Pharaonic\Laravel\ApiIdempotency\Exceptions\IdempotencyException;
+use Throwable;
 
-public function render($request, Exception $exception)
+public function render($request, Throwable $exception)
 {
     if ($exception instanceof IdempotencyException) {
         return response()->json([
