@@ -2,6 +2,15 @@
 
 All notable changes to this project are documented here.
 
+## 12.0.0 - Unreleased
+
+### Compatibility
+
+- Laravel 12 on PHP 8.2, 8.3, 8.4 and 8.5 (`illuminate/*` ^12.0).
+- The same API and behavior as 11.0.0.
+- `pharaonic/php-fingerprint` ~8.2.0, ~8.3.0, ~8.4.0 or ~8.5.0, matching the PHP version.
+- Laravel 12 still receives security fixes, so no advisory is ignored.
+
 ## 11.0.0 - Unreleased
 
 ### Compatibility
