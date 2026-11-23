@@ -2,11 +2,16 @@
 - Laravel Package {color=blue}
 - {release.label} {color=green}
 - {package.license} License {color=purple}
+- AI Ready {color=violet}
 :::
 
 # API Idempotency
 
 API Idempotency makes unsafe Laravel routes safe to retry. Add `->idempotent()` to a route; clients send an `Idempotency-Key` header. The first request reserves the key atomically and runs. A retry with the same key and the same request gets the stored response back without running your controller again. The same key with a different request, a duplicate that arrives while the first is still running, and a request whose outcome is unknown are all refused with a clear `409`.
+
+:::success AI Ready
+API Idempotency ships Laravel Boost resources: a guideline loaded in every session and an `api-idempotency-development` skill loaded when your agent works on idempotent endpoints. Run `php artisan boost:install` and Claude Code, Cursor, Codex, Copilot or Gemini CLI mark the right routes, scope keys and handle every error code. See [AI Ready](#ai-ready).
+:::
 
 :::features
 ### One Route Macro {icon="switch"}
@@ -26,6 +31,15 @@ Keys belong to one user or tenant; nobody sees another principal's response.
 
 ### Fail Closed {icon="shield-check"}
 Crashes, server errors and store outages never cause a silent second run.
+
+### Events and Quiet Logs {icon="eye"}
+Four events for every outcome; logs never carry the client's key, the user or the body.
+
+### Safe Pruning {icon="terminal"}
+idempotency:prune counts first, deletes with --apply, and keeps unresolved records until you ask.
+
+### AI Ready {icon="bot"}
+Laravel Boost resources teach your coding agent the macro, scopes, outcomes and error codes.
 :::
 
 :::warning Not exactly-once

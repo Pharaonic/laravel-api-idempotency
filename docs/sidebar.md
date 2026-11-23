@@ -11,6 +11,7 @@
   - [Failures and Recovery](#failures-and-recovery)
   - [Errors](#errors)
   - [Events and Logs](#events)
+  - [AI Ready](#ai-ready)
 - API Reference
   - [Reference](#api-reference)
 - Examples

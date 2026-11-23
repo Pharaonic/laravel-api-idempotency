@@ -9,6 +9,8 @@ badges:
     color: purple
   - label: "{package.downloadsShort}+ downloads"
     color: blue
+  - label: AI Ready · Laravel Boost
+    color: violet
 eyebrow: "{package.name}"
 title: Retry safely,
 highlight: run once
@@ -27,4 +29,4 @@ labels:
   copied: Copied!
 ---
 
-{package.name} adds `Idempotency-Key` handling to any Laravel route with one call: `->idempotent()`. The first request reserves its key atomically and runs; retries replay the stored response, concurrent duplicates wait their turn, and uncertain outcomes stay locked instead of running twice.
+{package.name} adds `Idempotency-Key` handling to any Laravel route with one call: `->idempotent()`. The first request reserves its key atomically and runs; retries replay the stored response, concurrent duplicates wait their turn, and uncertain outcomes stay locked instead of running twice. It is AI ready: `php artisan boost:install` teaches your coding agent the whole package through Laravel Boost.
