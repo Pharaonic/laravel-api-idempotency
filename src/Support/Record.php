@@ -39,8 +39,7 @@ final class Record
         public ?int $status = null,
         public array $headers = [],
         public ?string $body = null,
-    ) {
-    }
+    ) {}
 
     /**
      * A new reservation, kept at least as long as its lease

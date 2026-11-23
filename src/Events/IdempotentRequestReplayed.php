@@ -16,6 +16,5 @@ final class IdempotentRequestReplayed
     public function __construct(
         public Request $request,
         public string $key,
-    ) {
-    }
+    ) {}
 }

@@ -19,13 +19,13 @@ breadcrumbs:
 card:
   topic: api
   icon: shield-check
-  tags: api idempotency idempotency-key retries replay redis database concurrency payments
+  tags: api idempotency idempotency-key retries replay redis database concurrency payments ai-ready laravel-boost
   description: Opt-in HTTP idempotency for Laravel routes. Add ->idempotent() to a route and retried requests with the same Idempotency-Key replay the stored response instead of running twice.
 
 seo:
   title: "{package.fullName} - Idempotency-Key Middleware for Laravel APIs"
   description: "{package.name} makes Laravel POST routes safe to retry: atomic key reservation on the database or Redis, request fingerprints, response replay and fail-closed recovery. {package.license} licensed."
-  keywords: laravel idempotency, idempotency key, idempotent api, laravel middleware, retry safe api, redis, payments, duplicate requests
+  keywords: laravel idempotency, idempotency key, idempotent api, laravel middleware, retry safe api, redis, payments, duplicate requests, laravel boost, ai ready
   author: Pharaonic
   images:
     - "{package.cover}"

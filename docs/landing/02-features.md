@@ -23,4 +23,13 @@ items:
   - icon: shield-check
     title: Fail Closed
     text: Crashes, 5xx responses and store outages never lead to a silent second run. Unknown outcomes stay locked until you decide.
+  - icon: eye
+    title: Events and Quiet Logs
+    text: Four events for reserved, replayed, rejected and unresolved requests. Logs never carry the client's key, the user or the body.
+  - icon: terminal
+    title: Safe Pruning
+    text: "`php artisan idempotency:prune` counts first and deletes with `--apply`, keeping unresolved records until you ask."
+  - icon: bot
+    title: AI Ready
+    text: "Ships Laravel Boost resources: `php artisan boost:install` teaches your coding agent the macro, scopes, outcomes and error codes."
 ---

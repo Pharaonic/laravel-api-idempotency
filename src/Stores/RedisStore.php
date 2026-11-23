@@ -55,8 +55,7 @@ LUA;
     public function __construct(
         private Connection $redis,
         private string $prefix,
-    ) {
-    }
+    ) {}
 
     public function reserve(Record $record, int $now): ?Record
     {

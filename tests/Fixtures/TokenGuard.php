@@ -54,7 +54,5 @@ final class TokenGuard implements Guard
         return $this->check();
     }
 
-    public function setUser(Authenticatable $user): void
-    {
-    }
+    public function setUser(Authenticatable $user): void {}
 }

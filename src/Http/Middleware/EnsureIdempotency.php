@@ -62,8 +62,7 @@ final class EnsureIdempotency
         private Stores $stores,
         private Dispatcher $events,
         private LoggerInterface $logger,
-    ) {
-    }
+    ) {}
 
     /**
      * The middleware string for a route, validated when the route is defined

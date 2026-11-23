@@ -26,8 +26,7 @@ final class Options
         public int $lease,
         public string $scope,
         public int $maxResponseBytes,
-    ) {
-    }
+    ) {}
 
     /**
      * The package configuration, with a route's own ttl when it sets one
