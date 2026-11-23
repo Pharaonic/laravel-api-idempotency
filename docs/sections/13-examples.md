@@ -8,7 +8,7 @@ The browser generates one key per checkout attempt and reuses it on every retry.
 
   ```php title="routes/api.php"
   Route::middleware('auth:api')->group(function () {
-      Route::post('checkout', 'CheckoutController@store')->idempotent();
+      Route::post('checkout', [CheckoutController::class, 'store'])->idempotent();
   });
   ```
 
@@ -40,7 +40,7 @@ Keep replays for a week, and protect the charge on both sides.
 - ===Routes
 
   ```php title="routes/api.php"
-  Route::post('payments', 'PaymentController@store')->middleware('auth:api')->idempotent(ttl: 604800);
+  Route::post('payments', [PaymentController::class, 'store'])->middleware('auth:api')->idempotent(ttl: 604800);
   ```
 
 - ===Controller

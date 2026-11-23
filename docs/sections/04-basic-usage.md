@@ -3,10 +3,11 @@
 Call `idempotent()` on any route. It returns the same route, so the chain continues.
 
 ```php title="routes/api.php"
+use App\Http\Controllers\OrderController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:api')->group(function () {
-    Route::post('orders', 'OrderController@store')->name('orders.store')->idempotent();
+    Route::post('orders', [OrderController::class, 'store'])->name('orders.store')->idempotent();
 });
 ```
 
@@ -15,7 +16,7 @@ Route::middleware('auth:api')->group(function () {
 `ttl` is optional, in seconds, and works positionally or by name.
 
 ```php title="routes/api.php"
-Route::post('payments', 'PaymentController@store')->idempotent(ttl: 604800);
+Route::post('payments', [PaymentController::class, 'store'])->idempotent(ttl: 604800);
 ```
 
 A TTL outside 1 to 31536000 throws when the route is defined.
@@ -25,14 +26,14 @@ A TTL outside 1 to 31536000 throws when the route is defined.
 `apiResource()` and `resource()` accept the macro too. Safe methods (`GET`, `HEAD`, `OPTIONS`, `TRACE`) always pass through, so only `store`, `update` and `destroy` are protected.
 
 ```php title="routes/api.php"
-Route::apiResource('invoices', 'InvoiceController')->idempotent();
+Route::apiResource('invoices', InvoiceController::class)->idempotent();
 ```
 
 For a whole group, use the `idempotent` middleware alias, with the TTL as its parameter:
 
 ```php title="routes/api.php"
 Route::middleware(['auth:api', 'idempotent:600'])->group(function () {
-    Route::post('exports', 'ExportController@store');
+    Route::post('exports', [ExportController::class, 'store']);
 });
 ```
 
