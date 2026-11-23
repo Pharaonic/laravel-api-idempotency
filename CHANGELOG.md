@@ -2,6 +2,14 @@
 
 All notable changes to this project are documented here.
 
+## 8.0.0 - Unreleased
+
+### Compatibility
+
+- Laravel 8.75+ on PHP 8.0 and 8.1 (`illuminate/*` ^8.75).
+- The same API and behavior as 7.0.0.
+- `pharaonic/php-fingerprint` ~8.0.3 on PHP 8.0 and ~8.1.0 on PHP 8.1.
+
 ## 7.0.0 - Unreleased
 
 ### Compatibility
