@@ -43,7 +43,7 @@
     "orchestra/testbench": "^4.18",
     "phpstan/phpstan": "^2.1",
     "phpunit/phpunit": "^9.6.33",
-    "predis/predis": "^1.1.10"
+    "predis/predis": "^1.1.10 || ^3.0.0"
   },
   "suggest": {
     "ext-redis": "For the redis store with the phpredis client (predis/predis works too)."
