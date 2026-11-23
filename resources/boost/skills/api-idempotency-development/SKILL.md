@@ -117,7 +117,7 @@ php artisan idempotency:prune --apply                 # deletes them
 php artisan idempotency:prune --apply --unresolved    # also expired unknown and abandoned records
 ```
 
-Schedule it daily for the database store; Redis records expire by themselves.
+Schedule `idempotency:prune --apply` hourly for the database store; Redis records expire by themselves.
 
 ## Pitfalls
 
