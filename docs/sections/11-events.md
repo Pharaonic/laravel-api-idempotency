@@ -30,4 +30,4 @@ public function boot()
 
 ### Logs
 
-The package logs only problems: store failures (`error`), unknown outcomes and lost ownership (`warning`). Log context holds the first 16 characters of the storage key, the method and the route pattern; never the client's key, the user, or the request body.
+The package logs only problems: store failures (`error`), unknown outcomes and lost ownership (`warning`). Log context holds the first 16 characters of the storage key, the method and the route pattern, and for store failures the exception's class and code (and its message, except for database errors, whose SQL would carry the stored response); never the client's key, the user, the request body or the response.

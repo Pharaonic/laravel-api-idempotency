@@ -8,6 +8,7 @@ use Closure;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Route;
@@ -300,6 +301,10 @@ final class EnsureIdempotency
     /**
      * Log context without the client's key, scope or body
      *
+     * A store exception is reduced to its class, code and, outside the
+     * database, its message: a QueryException's message holds the SQL with its
+     * bindings, which are the stored response and the owner token.
+     *
      * @return array<string, mixed>
      */
     private function context(Record $record, ?Throwable $e = null): array
@@ -308,7 +313,9 @@ final class EnsureIdempotency
             'key' => substr($record->key, 0, 16),
             'method' => $record->method,
             'route' => $record->route,
-            'exception' => $e,
+            'exception' => $e === null ? null : get_class($e),
+            'code' => $e === null ? null : $e->getCode(),
+            'error' => $e === null || $e instanceof QueryException ? null : $e->getMessage(),
         ], static fn ($value): bool => $value !== null);
     }
 }

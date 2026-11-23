@@ -10,8 +10,10 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Pharaonic\Laravel\ApiIdempotency\Events\IdempotentRequestUnresolved;
+use Pharaonic\Laravel\ApiIdempotency\Tests\Fixtures\MemoryLogger;
 use Pharaonic\Laravel\ApiIdempotency\Tests\Fixtures\SideEffects;
 use Pharaonic\Laravel\ApiIdempotency\Tests\TestCase;
+use Psr\Log\LoggerInterface;
 
 final class OutcomeTest extends TestCase
 {
@@ -208,5 +210,27 @@ final class OutcomeTest extends TestCase
         $this->idempotent('/orders', ['quantity' => 2])->assertStatus(201)->assertJson(['id' => 1]);
 
         Event::assertDispatched(IdempotentRequestUnresolved::class, static fn (IdempotentRequestUnresolved $event): bool => $event->reason === 'store_failed');
+    }
+
+    public function test_store_failures_never_log_the_sql_bindings_and_so_never_the_response(): void
+    {
+        $logger = new MemoryLogger;
+        $this->app->instance(LoggerInterface::class, $logger);
+
+        SideEffects::$during = static function (): void {
+            Schema::drop('idempotency_keys');
+        };
+
+        $this->idempotent('/orders', ['quantity' => 2])->assertStatus(201)->assertJson(['id' => 1]);
+
+        $this->assertNotEmpty($logger->records);
+
+        foreach ($logger->records as $record) {
+            $this->assertStringNotContainsString('created', $record['context']);
+            $this->assertStringNotContainsString('response_body', $record['context']);
+            $this->assertStringNotContainsString('owner_token', $record['context']);
+        }
+
+        $this->assertStringContainsString('QueryException', $logger->records[0]['context']);
     }
 }
