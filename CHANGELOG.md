@@ -2,7 +2,7 @@
 
 All notable changes to this project are documented here.
 
-## 13.0.0 - Unreleased
+## 13.0.0 - 2026-11-23
 
 ### Compatibility
 
@@ -11,7 +11,7 @@ All notable changes to this project are documented here.
 - `pharaonic/php-fingerprint` ~8.3.0, ~8.4.0 or ~8.5.0, matching the PHP version.
 - The tests run on Pest 4 and PHPUnit 12.
 
-## 12.0.0 - Unreleased
+## 12.0.0 - 2026-11-23
 
 ### Compatibility
 
@@ -20,7 +20,7 @@ All notable changes to this project are documented here.
 - `pharaonic/php-fingerprint` ~8.2.0, ~8.3.0, ~8.4.0 or ~8.5.0, matching the PHP version.
 - Laravel 12 still receives security fixes, so no advisory is ignored.
 
-## 11.0.0 - Unreleased
+## 11.0.0 - 2026-11-23
 
 ### Compatibility
 
@@ -29,7 +29,7 @@ All notable changes to this project are documented here.
 - `pharaonic/php-fingerprint` ~8.2.0, ~8.3.0 or ~8.4.0, matching the PHP version.
 - The tests run on Pest 3 and PHPUnit 11.
 
-## 10.0.0 - Unreleased
+## 10.0.0 - 2026-11-23
 
 ### Added
 
@@ -41,7 +41,7 @@ All notable changes to this project are documented here.
 - The same API and behavior as 9.0.0.
 - `pharaonic/php-fingerprint` ~8.1.0, ~8.2.0 or ~8.3.0, matching the PHP version.
 
-## 9.0.0 - Unreleased
+## 9.0.0 - 2026-11-23
 
 ### Compatibility
 
@@ -49,7 +49,7 @@ All notable changes to this project are documented here.
 - The same API and behavior as 8.0.0.
 - `pharaonic/php-fingerprint` ~8.0.3, ~8.1.0 or ~8.2.0, matching the PHP version.
 
-## 8.0.0 - Unreleased
+## 8.0.0 - 2026-11-23
 
 ### Compatibility
 
@@ -57,7 +57,7 @@ All notable changes to this project are documented here.
 - The same API and behavior as 7.0.0.
 - `pharaonic/php-fingerprint` ~8.0.3 on PHP 8.0 and ~8.1.0 on PHP 8.1.
 
-## 7.0.0 - Unreleased
+## 7.0.0 - 2026-11-23
 
 ### Compatibility
 
@@ -65,7 +65,7 @@ All notable changes to this project are documented here.
 - The same API and behavior as 6.0.0.
 - `pharaonic/php-fingerprint` ~8.0.3.
 
-## 6.0.0 - Unreleased
+## 6.0.0 - 2026-11-23
 
 ### Added
 
