@@ -28,22 +28,22 @@
     "source": "https://github.com/Pharaonic/laravel-api-idempotency"
   },
   "require": {
-    "php": ">=8.2 <8.6",
-    "illuminate/console": "^12.0",
-    "illuminate/contracts": "^12.0",
-    "illuminate/database": "^12.0",
-    "illuminate/http": "^12.0",
-    "illuminate/redis": "^12.0",
-    "illuminate/routing": "^12.0",
-    "illuminate/support": "^12.0",
-    "pharaonic/php-fingerprint": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0"
+    "php": ">=8.3 <8.6",
+    "illuminate/console": "^13.0",
+    "illuminate/contracts": "^13.0",
+    "illuminate/database": "^13.0",
+    "illuminate/http": "^13.0",
+    "illuminate/redis": "^13.0",
+    "illuminate/routing": "^13.0",
+    "illuminate/support": "^13.0",
+    "pharaonic/php-fingerprint": "~8.3.0 || ~8.4.0 || ~8.5.0"
   },
   "require-dev": {
     "laravel/pint": "^1.20",
-    "orchestra/testbench": "^10.0",
-    "pestphp/pest": "^3.8 || ^4.0",
+    "orchestra/testbench": "^11.0",
+    "pestphp/pest": "^4.0",
     "phpstan/phpstan": "^2.1.33",
-    "phpunit/phpunit": "^11.5.50 || ^12.5.8",
+    "phpunit/phpunit": "^12.5.8",
     "predis/predis": "^1.1.10"
   },
   "suggest": {
