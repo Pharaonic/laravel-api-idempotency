@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Pharaonic\Laravel\ApiIdempotency\Exceptions;
 
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Throwable;
@@ -13,7 +15,9 @@ use Throwable;
  *
  * Renders as {"message": "...", "code": "idempotency_..."} with its HTTP
  * status. Customize it in your exception handler like any HttpException;
- * errorCode() returns one of the constants below.
+ * errorCode() returns one of the constants below. getMessage() stays in
+ * English for logs; the rendered message is localizedMessage(), from the
+ * api-idempotency::messages translations.
  */
 final class IdempotencyException extends HttpException
 {
@@ -56,9 +60,27 @@ final class IdempotencyException extends HttpException
         return $this->errorCode;
     }
 
+    /**
+     * The message in the current locale, or the English message when the locale has no line for it.
+     */
+    public function localizedMessage(): string
+    {
+        $container = Container::getInstance();
+
+        if (! $container->bound('translator')) {
+            return $this->getMessage();
+        }
+
+        $translator = $container->make('translator');
+        $line = 'api-idempotency::messages.'.substr($this->errorCode, strlen('idempotency_'));
+        $value = $translator instanceof Translator ? $translator->get($line) : null;
+
+        return is_string($value) && $value !== $line ? $value : $this->getMessage();
+    }
+
     public function render(): JsonResponse
     {
-        return new JsonResponse(['message' => $this->getMessage(), 'code' => $this->errorCode], $this->getStatusCode(), $this->getHeaders());
+        return new JsonResponse(['message' => $this->localizedMessage(), 'code' => $this->errorCode], $this->getStatusCode(), $this->getHeaders());
     }
 
     /**
