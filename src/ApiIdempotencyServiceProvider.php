@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Pharaonic\Laravel\ApiIdempotency;
 
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 use Pharaonic\Laravel\ApiIdempotency\Console\PruneCommand;
+use Pharaonic\Laravel\ApiIdempotency\Exceptions\IdempotencyException;
 use Pharaonic\Laravel\ApiIdempotency\Http\Middleware\EnsureIdempotency;
 use Pharaonic\Laravel\ApiIdempotency\Routing\IdempotentMacro;
 
@@ -51,6 +53,31 @@ final class ApiIdempotencyServiceProvider extends ServiceProvider
         });
 
         (new IdempotentMacro)->register();
+
+        $this->renderExceptions();
+    }
+
+    /**
+     * Laravel's handler asks an exception's own render() before its render
+     * callbacks, so a refusal is rendered by a callback instead, registered
+     * after the application's: an application's own callback, or a package
+     * that renders every API error, answers first.
+     */
+    private function renderExceptions(): void
+    {
+        $register = static function (mixed $handler): void {
+            if (is_object($handler) && method_exists($handler, 'renderable')) {
+                $handler->renderable(static fn (IdempotencyException $exception) => $exception->response());
+            }
+        };
+
+        if ($this->app->resolved(ExceptionHandler::class)) {
+            $register($this->app->make(ExceptionHandler::class));
+
+            return;
+        }
+
+        $this->app->afterResolving(ExceptionHandler::class, $register);
     }
 
     /**
