@@ -23,6 +23,16 @@ Refused requests throw `Pharaonic\Laravel\ApiIdempotency\Exceptions\IdempotencyE
 
 Each code is also a constant on the exception (`IdempotencyException::KEY_CONFLICT`), and `errorCode()` returns it.
 
+### Translated messages
+
+The `message` is translated in the application locale from `api-idempotency::messages`, keyed by the code without its `idempotency_` prefix (`key_missing`, `key_conflict`, …). English and Arabic ship with the package, and a locale without a line falls back to English. The `code` never changes with the locale. `getMessage()` stays in English for your logs, and `localizedMessage()` returns the translated message.
+
+Publish the files to change a line or add a language:
+
+```bash title="Terminal" no-line-numbers
+php artisan vendor:publish --tag=api-idempotency-translations
+```
+
 ### Your own error format
 
 Render the exception yourself in `bootstrap/app.php` to match your API's envelope:
@@ -34,7 +44,7 @@ use Pharaonic\Laravel\ApiIdempotency\Exceptions\IdempotencyException;
 ->withExceptions(function (Exceptions $exceptions) {
     $exceptions->render(function (IdempotencyException $e) {
         return response()->json([
-            'error' => ['code' => $e->errorCode(), 'detail' => $e->getMessage()],
+            'error' => ['code' => $e->errorCode(), 'detail' => $e->localizedMessage()],
         ], $e->getStatusCode(), $e->getHeaders());
     });
 })
