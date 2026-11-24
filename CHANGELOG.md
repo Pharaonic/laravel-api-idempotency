@@ -2,6 +2,16 @@
 
 All notable changes to this project are documented here.
 
+## 13.1.0 - Unreleased
+
+### Added
+
+- Translated error messages in the `api-idempotency` namespace, English and Arabic, published with the `api-idempotency-translations` tag, and `IdempotencyException::localizedMessage()`. The rendered `message` follows the application locale; `getMessage()` and `code` stay the same.
+
+### Behavior Changes from 13.0.x
+
+- In a locale other than English, the error message is sent in that locale when the package has a line for it, Arabic included. English applications see no change.
+
 ## 13.0.0 - 2026-11-23
 
 ### Compatibility
