@@ -35,7 +35,7 @@ php artisan vendor:publish --tag=api-idempotency-translations
 
 ### Your own error format
 
-Render the exception yourself in `bootstrap/app.php` to match your API's envelope:
+Render the exception yourself in `bootstrap/app.php` to match your API's envelope. Your callback always wins: the package renders its own JSON from a callback registered after yours.
 
 ```php title="bootstrap/app.php"
 use Illuminate\Foundation\Configuration\Exceptions;
