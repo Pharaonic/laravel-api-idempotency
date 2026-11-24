@@ -78,9 +78,23 @@ final class IdempotencyException extends HttpException
         return is_string($value) && $value !== $line ? $value : $this->getMessage();
     }
 
-    public function render(): JsonResponse
+    /**
+     * The response the package sends: {"message": "...", "code": "..."} with the status and headers.
+     */
+    public function response(): JsonResponse
     {
         return new JsonResponse(['message' => $this->localizedMessage(), 'code' => $this->errorCode], $this->getStatusCode(), $this->getHeaders());
+    }
+
+    /**
+     * Called without arguments, the same as response(). Laravel's exception
+     * handler calls it with the request and gets null, so the handler's render
+     * callbacks decide: the application's own first, then the package's, which
+     * sends response().
+     */
+    public function render(): ?JsonResponse
+    {
+        return func_num_args() === 0 ? $this->response() : null;
     }
 
     /**
