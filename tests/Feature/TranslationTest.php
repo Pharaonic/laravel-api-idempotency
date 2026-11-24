@@ -89,4 +89,13 @@ final class TranslationTest extends TestCase
             $this->assertSame(array_keys($english), array_keys(require $file), $file);
         }
     }
+
+    public function test_render_sends_the_package_response(): void
+    {
+        $exception = IdempotencyException::inProgress(5);
+
+        $this->assertSame(['message' => 'A request with this idempotency key is still being processed.', 'code' => 'idempotency_in_progress'], $exception->response()->getData(true));
+        $this->assertSame('5', $exception->response()->headers->get('Retry-After'));
+        $this->assertSame($exception->response()->getData(true), $exception->render()->getData(true));
+    }
 }
