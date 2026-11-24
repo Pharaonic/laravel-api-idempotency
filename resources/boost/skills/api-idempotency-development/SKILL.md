@@ -98,7 +98,9 @@ A request still running gets `409 idempotency_in_progress` with `Retry-After`; a
 | 400 | `idempotency_request_invalid` | Invalid or too deeply nested JSON. |
 | 503 | `idempotency_store_unavailable` | The store failed before the route ran. |
 
-Render it in your exception handler for a custom error envelope; replays are never changed.
+The `message` is translated in the application locale from `api-idempotency::messages`, keyed by the code without `idempotency_` (English and Arabic, published with `--tag=api-idempotency-translations`). `getMessage()` stays English for logs; `localizedMessage()` returns the translated message.
+
+Render it in your exception handler for a custom error envelope, with `localizedMessage()` as its message; replays are never changed.
 
 ## Events
 
