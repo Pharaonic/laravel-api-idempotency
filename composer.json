@@ -30,6 +30,7 @@
   "require": {
     "php": ">=8.0 <8.1",
     "illuminate/console": "^6.20",
+    "illuminate/container": "^6.20",
     "illuminate/contracts": "^6.20",
     "illuminate/database": "^6.20",
     "illuminate/http": "^6.20",
