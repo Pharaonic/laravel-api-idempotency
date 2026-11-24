@@ -78,9 +78,17 @@ final class IdempotencyException extends HttpException
         return is_string($value) && $value !== $line ? $value : $this->getMessage();
     }
 
-    public function render(): JsonResponse
+    /**
+     * The response the package sends: {"message": "...", "code": "..."} with the status and headers.
+     */
+    public function response(): JsonResponse
     {
         return new JsonResponse(['message' => $this->localizedMessage(), 'code' => $this->errorCode], $this->getStatusCode(), $this->getHeaders());
+    }
+
+    public function render(): JsonResponse
+    {
+        return $this->response();
     }
 
     /**
