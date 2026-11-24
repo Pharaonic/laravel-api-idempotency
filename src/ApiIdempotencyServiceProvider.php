@@ -19,6 +19,8 @@ final class ApiIdempotencyServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'api-idempotency');
+
         if ($this->app->runningInConsole()) {
             $this->publishes([
                 __DIR__.'/../config/api-idempotency.php' => $this->app->configPath('pharaonic/api-idempotency.php'),
@@ -29,6 +31,10 @@ final class ApiIdempotencyServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__.'/../database/migrations' => $this->app->databasePath('migrations'),
             ], ['pharaonic', 'laravel-api-idempotency', 'pharaonic-migrations', 'api-idempotency-migrations']);
+
+            $this->publishes([
+                __DIR__.'/../resources/lang' => lang_path('vendor/api-idempotency'),
+            ], ['pharaonic', 'laravel-api-idempotency', 'pharaonic-translations', 'api-idempotency-translations']);
 
             $this->commands([PruneCommand::class]);
         }
