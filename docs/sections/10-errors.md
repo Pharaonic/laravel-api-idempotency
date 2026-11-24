@@ -35,7 +35,7 @@ php artisan vendor:publish --tag=api-idempotency-translations
 
 ### Your own error format
 
-Render the exception yourself in your exception handler to match your API's envelope:
+Render the exception yourself in your exception handler to match your API's envelope. Your `render()` override or `renderable()` callback always wins: the package renders its own JSON from a callback registered after yours.
 
 ```php title="app/Exceptions/Handler.php"
 use Pharaonic\Laravel\ApiIdempotency\Exceptions\IdempotencyException;
