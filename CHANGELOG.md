@@ -6,6 +6,7 @@ All notable changes to this project are documented here.
 
 ### Added
 
+- `IdempotencyException::response()`, the JSON response the package sends for a refusal.
 - Translated error messages in the `api-idempotency` namespace, English and Arabic, published with the `api-idempotency-translations` tag, and `IdempotencyException::localizedMessage()`. The rendered `message` follows the application locale; `getMessage()` and `code` stay the same.
 
 ### Behavior Changes from 6.0.x
