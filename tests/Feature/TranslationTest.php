@@ -74,3 +74,11 @@ test('every locale has the english keys', function () {
         expect(array_keys(require $file))->toBe(array_keys($english));
     }
 });
+
+test('render sends the package response', function () {
+    $exception = IdempotencyException::inProgress(5);
+
+    expect($exception->response()->getData(true))->toBe(['message' => 'A request with this idempotency key is still being processed.', 'code' => 'idempotency_in_progress'])
+        ->and($exception->response()->headers->get('Retry-After'))->toBe('5')
+        ->and($exception->render()->getData(true))->toBe($exception->response()->getData(true));
+});
