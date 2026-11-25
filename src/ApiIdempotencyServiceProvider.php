@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Pharaonic\Laravel\ApiIdempotency;
 
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 use Pharaonic\Laravel\ApiIdempotency\Console\PruneCommand;
+use Pharaonic\Laravel\ApiIdempotency\Exceptions\IdempotencyException;
 use Pharaonic\Laravel\ApiIdempotency\Http\Middleware\EnsureIdempotency;
 use Pharaonic\Laravel\ApiIdempotency\Routing\IdempotentMacro;
 
@@ -19,6 +21,8 @@ final class ApiIdempotencyServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'api-idempotency');
+
         if ($this->app->runningInConsole()) {
             $this->publishes([
                 __DIR__.'/../config/api-idempotency.php' => $this->app->configPath('pharaonic/api-idempotency.php'),
@@ -29,6 +33,10 @@ final class ApiIdempotencyServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__.'/../database/migrations' => $this->app->databasePath('migrations'),
             ], ['pharaonic', 'laravel-api-idempotency', 'pharaonic-migrations', 'api-idempotency-migrations']);
+
+            $this->publishes([
+                __DIR__.'/../resources/lang' => $this->app->resourcePath('lang/vendor/api-idempotency'),
+            ], ['pharaonic', 'laravel-api-idempotency', 'pharaonic-translations', 'api-idempotency-translations']);
 
             $this->commands([PruneCommand::class]);
         }
@@ -45,6 +53,31 @@ final class ApiIdempotencyServiceProvider extends ServiceProvider
         });
 
         (new IdempotentMacro)->register();
+
+        $this->renderExceptions();
+    }
+
+    /**
+     * Laravel's handler asks an exception's own render() before its render
+     * callbacks, so a refusal is rendered by a callback instead, registered
+     * after the application's: an application's own callback, or a package
+     * that renders every API error, answers first.
+     */
+    private function renderExceptions(): void
+    {
+        $register = static function (mixed $handler): void {
+            if (is_object($handler) && method_exists($handler, 'renderable')) {
+                $handler->renderable(static fn (IdempotencyException $exception) => $exception->response());
+            }
+        };
+
+        if ($this->app->resolved(ExceptionHandler::class)) {
+            $register($this->app->make(ExceptionHandler::class));
+
+            return;
+        }
+
+        $this->app->afterResolving(ExceptionHandler::class, $register);
     }
 
     /**
