@@ -8,6 +8,7 @@ Opt-in HTTP idempotency for Laravel routes: `->idempotent()` reserves the client
 - Clients send one `Idempotency-Key` header of 1 to 255 visible ASCII characters, a UUID per user action, and resend the exact same request on retry.
 - Keys are scoped per principal: the authenticated user by default, so idempotent routes need authentication (`auth:sanctum`, `auth:api`) or a custom `ScopeResolver`.
 - Only `2xx` JSON (or empty) responses are stored; other `4xx` release the key; `5xx`, exceptions and unstorable successes lock it as an unknown outcome that never runs again by itself.
+- Refusals render `{"message", "code"}`: the message follows the application locale (`api-idempotency::messages`, English and Arabic), the code never changes.
 - The database store needs its published migration (`--tag=api-idempotency-migrations`); Redis needs none.
 - This package prevents duplicate execution of one key; it is not exactly-once delivery. For payments, also enforce a unique business reference.
 
