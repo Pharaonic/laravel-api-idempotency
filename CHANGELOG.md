@@ -2,6 +2,21 @@
 
 All notable changes to this project are documented here.
 
+## 12.1.0 - Unreleased
+
+### Added
+
+- `IdempotencyException::response()`, the JSON response the package sends for a refusal.
+- Translated error messages in the `api-idempotency` namespace, English and Arabic, published with the `api-idempotency-translations` tag, and `IdempotencyException::localizedMessage()`. The rendered `message` follows the application locale; `getMessage()` and `code` stay the same.
+
+### Fixed
+
+- An application's own `renderable()` or `$exceptions->render()` callback for `IdempotencyException`, or one for every exception, now runs. Before, the exception's `render()` answered first, so the documented custom format was never sent. Without such a callback the response is the same.
+
+### Behavior Changes from 12.0.x
+
+- In a locale other than English, the error message is sent in that locale when the package has a line for it, Arabic included. English applications see no change.
+
 ## 12.0.0 - 2026-11-23
 
 ### Compatibility
