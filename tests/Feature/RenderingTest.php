@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Http\JsonResponse;
 use Pharaonic\Laravel\ApiIdempotency\Exceptions\IdempotencyException;
+use Pharaonic\Laravel\ApiIdempotency\Tests\Fixtures\EnvelopeExceptionHandler;
 use Pharaonic\Laravel\ApiIdempotency\Tests\Fixtures\RenderingExceptionHandler;
 
 test('the package renders a refusal when the application does not', function () {
@@ -20,6 +21,24 @@ test('a render callback of the application wins over the package', function () {
 
     $this->idempotent('/orders', ['quantity' => 2], null)->assertStatus(400)->assertExactJson(['error' => 'idempotency_key_missing']);
     $this->assertNothingRan();
+});
+
+test('a callback for every exception wins over the package', function () {
+    $this->app->singleton(ExceptionHandler::class, EnvelopeExceptionHandler::class);
+    $this->app->forgetInstance(ExceptionHandler::class);
+    $this->app->make(ExceptionHandler::class);
+
+    $this->idempotent('/orders', ['quantity' => 2], null)->assertStatus(422)->assertExactJson(['envelope' => IdempotencyException::class]);
+});
+
+test('the package renders a refusal that every application callback declines', function () {
+    $this->app->singleton(ExceptionHandler::class, EnvelopeExceptionHandler::class);
+    $this->app->forgetInstance(ExceptionHandler::class);
+    $this->app->make(ExceptionHandler::class);
+
+    $this->idempotent('/orders', ['quantity' => 2], null, 1, ['Accept' => 'text/html'])
+        ->assertStatus(400)
+        ->assertExactJson(['message' => 'The Idempotency-Key header is required.', 'code' => 'idempotency_key_missing']);
 });
 
 test('render without arguments is the package response and with the request defers to the handler', function () {
