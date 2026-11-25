@@ -20,7 +20,7 @@
 | --- | --- |
 | `Contracts\ScopeResolver` | `resolve(Request $request): ?string`, the key space of a request. |
 | `Scopes\AuthenticatedUser` | Default resolver: the authenticated user's class and identifier. |
-| `Exceptions\IdempotencyException` | Refused request. `errorCode(): string`, `getStatusCode(): int`, `getHeaders(): array`, `render(): JsonResponse`, and one constant per code. |
+| `Exceptions\IdempotencyException` | Refused request. `errorCode(): string`, `localizedMessage(): string`, `getStatusCode(): int`, `getHeaders(): array`, `response(): JsonResponse` (the JSON the package sends), `render()`, and one constant per code. |
 | `Events\IdempotentRequestReserved` | `$request`, `$key` |
 | `Events\IdempotentRequestReplayed` | `$request`, `$key` |
 | `Events\IdempotentRequestRejected` | `$request`, `$key`, `$reason` |
